@@ -19,5 +19,7 @@ def create_app():
     # Import models (important for migrations later)
     from app.authentication.models.user_model import User
     from app.products.models.product_model import Product
+    from app.authentication.routes.auth_routes import register_routes
+    register_routes(app)
 
     return app
