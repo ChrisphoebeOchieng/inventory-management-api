@@ -38,11 +38,11 @@ def register_routes(app):
         db.session.add(new_user)
         db.session.commit()
 
-        # ✅ Return clean user (no password)
+        # ✅ Return user (without password)
         return user_schema.jsonify(new_user), 201
 
 
-    # ✅ LOGIN USER (JWT)
+    # ✅ LOGIN USER
     @app.route("/login", methods=["POST"])
     def login():
         data = request.get_json()
@@ -62,7 +62,7 @@ def register_routes(app):
         if not user or not user.check_password(password):
             return jsonify({"error": "Invalid credentials"}), 401
 
-        # 🔐 Create JWT token (with RBAC role)
+        # 🔐 Create JWT token (with role for RBAC)
         access_token = create_access_token(
             identity={
                 "id": user.id,
