@@ -9,7 +9,6 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
         load_instance = True
         exclude = ("password_hash",)
 
-    # ✅ Add validation rules
     username = fields.Str(required=True)
     email = fields.Email(required=True)
     password = fields.Str(load_only=True, required=True)

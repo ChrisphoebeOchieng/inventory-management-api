@@ -8,7 +8,7 @@ def create_app():
     # Config
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///inventory.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['JWT_SECRET_KEY'] = 'super-secret-key'  # change later
+    app.config['JWT_SECRET_KEY'] = 'super-secret-key-that-is-long-enough-123456'  
 
     # Initialize extensions
     db.init_app(app)
