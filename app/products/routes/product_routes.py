@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from app.extensions import db
 from app.products.models.product_model import Product
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.common.decorators import require_role
 from app.products.schemas import product_schema, products_schema
 
@@ -26,17 +26,20 @@ def product_routes(app):
         if not name or price is None:
             return jsonify({"error": "Name and price are required"}), 400
 
+        # 🔐 GET LOGGED-IN USER
+        current_user = get_jwt_identity()
+
         new_product = Product(
             name=name,
             description=description,
             price=price,
-            quantity=quantity
+            quantity=quantity,
+            user_id=current_user["id"]  # 🔗 LINK TO USER
         )
 
         db.session.add(new_product)
         db.session.commit()
 
-        # ✅ Return created product using schema
         return product_schema.jsonify(new_product), 201
 
 
@@ -45,8 +48,6 @@ def product_routes(app):
     @app.route("/products", methods=["GET"])
     def get_products():
         products = Product.query.all()
-
-        # ✅ Use schema (no manual loop)
         return products_schema.jsonify(products), 200
 
 
@@ -84,7 +85,6 @@ def product_routes(app):
 
         db.session.commit()
 
-        # ✅ Return updated product
         return product_schema.jsonify(product), 200
 
 
