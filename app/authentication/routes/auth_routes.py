@@ -1,6 +1,7 @@
 from flask import request, jsonify
 from app.extensions import db
 from app.authentication.models.user_model import User
+from app.authentication.schemas import user_schema
 from flask_jwt_extended import create_access_token
 
 
@@ -37,9 +38,8 @@ def register_routes(app):
         db.session.add(new_user)
         db.session.commit()
 
-        return jsonify({
-            "message": "User registered successfully"
-        }), 201
+        # ✅ Return clean user (no password)
+        return user_schema.jsonify(new_user), 201
 
 
     # ✅ LOGIN USER (JWT)
@@ -62,7 +62,7 @@ def register_routes(app):
         if not user or not user.check_password(password):
             return jsonify({"error": "Invalid credentials"}), 401
 
-        # 🔐 CREATE JWT TOKEN (WITH ROLE FOR RBAC)
+        # 🔐 Create JWT token (with RBAC role)
         access_token = create_access_token(
             identity={
                 "id": user.id,
@@ -70,7 +70,8 @@ def register_routes(app):
             }
         )
 
+        # ✅ Return user + token
         return jsonify({
-            "message": "Login successful",
+            "user": user_schema.dump(user),
             "access_token": access_token
         }), 200
