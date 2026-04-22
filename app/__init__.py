@@ -21,5 +21,7 @@ def create_app():
     from app.products.models.product_model import Product
     from app.authentication.routes.auth_routes import register_routes
     register_routes(app)
+    from app.products.routes.product_routes import product_routes
+    product_routes(app)
 
     return app
