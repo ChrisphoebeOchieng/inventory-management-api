@@ -10,5 +10,8 @@ class Product(db.Model):
     price = db.Column(db.Float, nullable=False)
     quantity = db.Column(db.Integer, default=0)
 
-    # 🔗 RELATIONSHIP (NEW)
+    # 🔗 Relationship to User
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
+    # 🔗 Relationship to Category (NEW)
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))
