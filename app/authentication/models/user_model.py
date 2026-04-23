@@ -11,7 +11,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(50), default="user")
 
-    # 🔗 RELATIONSHIP (NEW)
+    # 🔗 relationship
     products = db.relationship("Product", backref="owner", lazy=True)
 
     def set_password(self, password):
