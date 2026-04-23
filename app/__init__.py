@@ -7,16 +7,14 @@ def create_app():
     app = Flask(__name__)
 
     # =========================
-    # CONFIGURATION
+    # CONFIG
     # =========================
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///inventory.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-    # 🔐 JWT Config
-    app.config["JWT_SECRET_KEY"] = "super-secret-key-that-is-long-enough-123456"
+    app.config["JWT_SECRET_KEY"] = "super-secret-key"
 
     # =========================
-    # INITIALIZE EXTENSIONS
+    # INIT EXTENSIONS
     # =========================
     db.init_app(app)
     ma.init_app(app)
@@ -24,11 +22,12 @@ def create_app():
     JWTManager(app)
 
     # =========================
-    # IMPORT MODELS (VERY IMPORTANT)
+    # IMPORT MODELS (IMPORTANT)
     # =========================
     from app.authentication.models.user_model import User
     from app.products.models.product_model import Product
     from app.products.models.category_model import Category
+    from app.orders.models.order_model import Order   # ✅ NEW
 
     # =========================
     # REGISTER ROUTES
@@ -40,10 +39,10 @@ def create_app():
     product_routes(app)
 
     # =========================
-    # TEST ROUTE
+    # HOME
     # =========================
     @app.route("/")
     def home():
-        return {"message": "Inventory Management API is running!"}
+        return {"message": "API running"}
 
     return app
