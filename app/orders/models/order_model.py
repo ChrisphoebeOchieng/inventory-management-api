@@ -6,8 +6,7 @@ class Order(db.Model):
     __tablename__ = "orders"
 
     id = db.Column(db.Integer, primary_key=True)
-    total_price = db.Column(db.Float, nullable=False)
+    total_price = db.Column(db.Float)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # 🔗 Relationship to User
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))

@@ -5,13 +5,12 @@ class Product(db.Model):
     __tablename__ = "products"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100))
     description = db.Column(db.String(255))
-    price = db.Column(db.Float, nullable=False)
+    price = db.Column(db.Float)
     quantity = db.Column(db.Integer, default=0)
 
-    # 🔗 Relationship to User
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
-    # 🔗 Relationship to Category (NEW)
+    
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))
