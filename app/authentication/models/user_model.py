@@ -11,9 +11,11 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(50), default="user")
 
-    # 🔗 relationship
+    # 🔗 Relationships
     products = db.relationship("Product", backref="owner", lazy=True)
+    orders = db.relationship("Order", backref="user", lazy=True)
 
+    # 🔐 Password methods
     def set_password(self, password):
         self.password_hash = generate_password_hash(password, method="pbkdf2:sha256")
 
