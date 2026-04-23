@@ -1,17 +1,19 @@
 from flask import request, jsonify
 from app.extensions import db
 from app.products.models.product_model import Product
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.common.decorators import require_role
 from app.products.schemas import product_schema, products_schema
+from app.common.decorators import require_role
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
 def product_routes(app):
 
+    # =========================
     # ✅ CREATE PRODUCT (Admin only)
+    # =========================
+    @app.route("/products", methods=["POST"])
     @jwt_required()
     @require_role("admin")
-    @app.route("/products", methods=["POST"])
     def create_product():
         data = request.get_json()
 
@@ -26,33 +28,38 @@ def product_routes(app):
         if not name or price is None:
             return jsonify({"error": "Name and price are required"}), 400
 
-        # 🔐 GET LOGGED-IN USER
-        current_user = get_jwt_identity()
+        # ✅ FIX: get user id correctly from JWT
+        current_user_id = int(get_jwt_identity())
 
         new_product = Product(
             name=name,
             description=description,
             price=price,
             quantity=quantity,
-            user_id=current_user["id"]  # 🔗 LINK TO USER
+            user_id=current_user_id
         )
 
         db.session.add(new_product)
         db.session.commit()
 
-        return product_schema.jsonify(new_product), 201
+        return jsonify({
+            "message": "Product created successfully",
+            "product": product_schema.dump(new_product)
+        }), 201
 
 
-    # ✅ GET ALL PRODUCTS
-    @jwt_required()
+    # =========================
+    # ✅ GET ALL PRODUCTS (Public)
+    # =========================
     @app.route("/products", methods=["GET"])
     def get_products():
         products = Product.query.all()
         return products_schema.jsonify(products), 200
 
 
+    # =========================
     # ✅ GET SINGLE PRODUCT
-    @jwt_required()
+    # =========================
     @app.route("/products/<int:product_id>", methods=["GET"])
     def get_product(product_id):
         product = Product.query.get(product_id)
@@ -63,10 +70,12 @@ def product_routes(app):
         return product_schema.jsonify(product), 200
 
 
+    # =========================
     # ✅ UPDATE PRODUCT (Admin only)
+    # =========================
+    @app.route("/products/<int:product_id>", methods=["PUT"])
     @jwt_required()
     @require_role("admin")
-    @app.route("/products/<int:product_id>", methods=["PUT"])
     def update_product(product_id):
         product = Product.query.get(product_id)
 
@@ -85,13 +94,18 @@ def product_routes(app):
 
         db.session.commit()
 
-        return product_schema.jsonify(product), 200
+        return jsonify({
+            "message": "Product updated successfully",
+            "product": product_schema.dump(product)
+        }), 200
 
 
+    # =========================
     # ✅ DELETE PRODUCT (Admin only)
+    # =========================
+    @app.route("/products/<int:product_id>", methods=["DELETE"])
     @jwt_required()
     @require_role("admin")
-    @app.route("/products/<int:product_id>", methods=["DELETE"])
     def delete_product(product_id):
         product = Product.query.get(product_id)
 

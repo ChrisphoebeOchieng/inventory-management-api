@@ -1,27 +1,29 @@
 from functools import wraps
 from flask import jsonify
-from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
+from flask_jwt_extended import get_jwt_identity, jwt_required
+from app.authentication.models.user_model import User
 
 
 def require_role(role):
-    def decorator(func):
-        @wraps(func)
+    def decorator(fn):
+        @wraps(fn)
+        @jwt_required()
         def wrapper(*args, **kwargs):
 
-            #  Ensure token is present
-            verify_jwt_in_request()
+            # ✅ get user id from token
+            user_id = int(get_jwt_identity())
 
-            # Get user from token
-            user = get_jwt_identity()
+            # ✅ fetch user from DB
+            user = User.query.get(user_id)
 
             if not user:
-                return jsonify({"error": "Invalid token"}), 401
+                return jsonify({"error": "User not found"}), 404
 
-            # Check role
-            if user.get("role") != role:
-                return jsonify({"error": "Access denied"}), 403
+            # ✅ check role from DB
+            if user.role != role:
+                return jsonify({"error": "Access forbidden"}), 403
 
-            return func(*args, **kwargs)
+            return fn(*args, **kwargs)
 
         return wrapper
     return decorator

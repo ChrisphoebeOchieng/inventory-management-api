@@ -19,17 +19,17 @@ def register_routes(app):
             return jsonify({"error": "Invalid JSON data"}), 400
 
         try:
-            # ✅ Validate input using schema
+            # Validate with schema
             user_data = user_schema.load(data)
         except ValidationError as err:
             return jsonify(err.messages), 400
 
-        # Check if user already exists
+        # Check if user exists
         existing_user = User.query.filter_by(email=user_data["email"]).first()
         if existing_user:
             return jsonify({"error": "User already exists"}), 400
 
-        # Create new user
+        # Create user
         new_user = User(
             username=user_data["username"],
             email=user_data["email"]
@@ -63,15 +63,10 @@ def register_routes(app):
         if not user or not user.check_password(password):
             return jsonify({"error": "Invalid credentials"}), 401
 
-        # 🔐 CREATE JWT TOKEN (with RBAC role)
-        access_token = create_access_token(
-            identity={
-                "id": user.id,
-                "role": user.role
-            }
-        )
+        # ✅ FIX: identity MUST be string
+        access_token = create_access_token(identity=str(user.id))
 
-        # ✅ RETURN USER + TOKEN
+        # Return user + token
         return jsonify({
             "user": user_schema.dump(user),
             "access_token": access_token
