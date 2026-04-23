@@ -38,6 +38,10 @@ def create_app():
     from app.products.routes.product_routes import product_routes
     product_routes(app)
 
+    from app.orders.routes.order_routes import order_routes
+    order_routes(app)
+
+
     # =========================
     # HOME
     # =========================
